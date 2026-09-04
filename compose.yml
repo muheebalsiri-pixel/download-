@@ -1,0 +1,9 @@
+services:
+  telegram-video-bot:
+    build: .
+    restart: unless-stopped
+    environment:
+      BOT_TOKEN: ${BOT_TOKEN}
+      MAX_FILE_SIZE_MB: ${MAX_FILE_SIZE_MB:-49}
+      MAX_CONCURRENT_DOWNLOADS: ${MAX_CONCURRENT_DOWNLOADS:-2}
+      DOWNLOAD_TIMEOUT: ${DOWNLOAD_TIMEOUT:-300}
