@@ -1,7 +1,10 @@
 services:
   telegram-video-bot:
     build: .
+    container_name: telegram-video-bot
     restart: unless-stopped
+    env_file:
+      - .env
     environment:
       BOT_TOKEN: ${BOT_TOKEN}
       MAX_FILE_SIZE_MB: ${MAX_FILE_SIZE_MB:-49}
