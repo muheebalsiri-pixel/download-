@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import asyncio
 import logging
 import os
@@ -78,7 +79,7 @@ def download_video(url: str, output_dir: str) -> tuple[Path, dict]:
         "fragment_retries": 2,
         "socket_timeout": 30,
         "merge_output_format": "mp4",
-        "format": f"bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best",
+        "format": "bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best",
         "http_headers": {
             "User-Agent": (
                 "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
@@ -160,7 +161,7 @@ async def handle_link(update: Update, context: ContextTypes.DEFAULT_TYPE) -> Non
     status = await update.message.reply_text("⏳ جارٍ فحص الرابط وبدء التنزيل...")
     await update.message.chat.send_action(ChatAction.TYPING)
 
-    async with _semaphore_context(DOWNLOAD_SEMAPHORE):
+    async with DOWNLOAD_SEMAPHORE:
         temp_dir = tempfile.mkdtemp(prefix="video_bot_")
         try:
             loop = asyncio.get_running_loop()
@@ -203,19 +204,6 @@ async def handle_link(update: Update, context: ContextTypes.DEFAULT_TYPE) -> Non
             await status.edit_text(f"❌ {friendly_error(exc)}")
         finally:
             shutil.rmtree(temp_dir, ignore_errors=True)
-
-
-class _semaphore_context:
-    def __init__(self, semaphore: asyncio.Semaphore):
-        self.semaphore = semaphore
-
-    async def __aenter__(self):
-        await self.semaphore.acquire()
-        return self
-
-    async def __aexit__(self, exc_type, exc, tb):
-        self.semaphore.release()
-        return False
 
 
 def main() -> None:
